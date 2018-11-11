@@ -233,8 +233,6 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "开启直播成功", Toast.LENGTH_SHORT).show();
                         }
                         logDialog.addLog("\n\n开启直播成功");
-                        btnCloseLiveRoom.setEnabled(true);
-                        btnToMyLiveRoom.setEnabled(true);
                         break;
                     case MainParam.openLiveRoomFail:
                         if (!logDialog.isShowing()) {
@@ -259,8 +257,6 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "关闭直播间成功", Toast.LENGTH_SHORT).show();
                         }
                         logDialog.addLog("\n" + msg.obj.toString());
-                        btnCloseLiveRoom.setEnabled(false);
-                        btnToMyLiveRoom.setEnabled(false);
                         break;
                     case MainParam.closeLiveRoomFail:
                         if (!logDialog.isShowing()) {
@@ -273,8 +269,6 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, msg.obj.toString().replaceAll("\n", ""), Toast.LENGTH_SHORT).show();
                         }
                         logDialog.addLog("\n" + msg.obj.toString());
-                        btnCloseLiveRoom.setEnabled(true);
-                        btnToMyLiveRoom.setEnabled(true);
                         break;
                     case MainParam.updateTitleAndOpenLiveRoomFail:
                         if (!logDialog.isShowing()) {
@@ -436,9 +430,6 @@ public class MainActivity extends AppCompatActivity {
         rbOnlyImage = findViewById(R.id.rbOnlyImage);
         cbTwoInOne = findViewById(R.id.cbTwoInOne);
         rbBoth.setChecked(true);
-
-        btnCloseLiveRoom.setEnabled(false);
-        btnToMyLiveRoom.setEnabled(false);
     }
 
     private void initData() {
