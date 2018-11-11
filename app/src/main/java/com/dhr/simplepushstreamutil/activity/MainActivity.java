@@ -35,12 +35,12 @@ import com.dhr.simplepushstreamutil.dialog.areasettingdialog.AreaSettingDialog;
 import com.dhr.simplepushstreamutil.dialog.bilibiliacount.BilibiliAccountDialog;
 import com.dhr.simplepushstreamutil.dialog.configscheme.ConfigSchemeDialog;
 import com.dhr.simplepushstreamutil.dialog.log.LogDialog;
-import com.dhr.simplepushstreamutil.dialog.resourceurl.ResourceUrlInfoDialog;
-import com.dhr.simplepushstreamutil.dialog.resourceurl.SaveResourceUrlInfoDialog;
+import com.dhr.simplepushstreamutil.dialog.sourceurl.SourceUrlInfoDialog;
+import com.dhr.simplepushstreamutil.dialog.sourceurl.SaveSourceUrlInfoDialog;
 import com.dhr.simplepushstreamutil.dialog.serverinfo.SaveServerInfoDialog;
 import com.dhr.simplepushstreamutil.dialog.serverinfo.ServerInfoDialog;
-import com.dhr.simplepushstreamutil.dialog.targeturl.SaveTargetUrlInfoDialog;
-import com.dhr.simplepushstreamutil.dialog.targeturl.TargetUrlInfoDialog;
+import com.dhr.simplepushstreamutil.dialog.liveroomurl.SaveLiveRoomUrlInfoDialog;
+import com.dhr.simplepushstreamutil.dialog.liveroomurl.LiveRoomUrlInfoDialog;
 import com.dhr.simplepushstreamutil.entity.LiveAreaListEntity;
 import com.dhr.simplepushstreamutil.mina.MinaClient;
 import com.dhr.simplepushstreamutil.params.MainParam;
@@ -78,16 +78,16 @@ public class MainActivity extends AppCompatActivity {
     private ConfigSchemeDialog configSchemeDialog;
 
     private EditText etResourceUrl;
-    private Button btnSaveResourceUrl;
-    private Button btnLoadResourceUrlInfo;
-    private SaveResourceUrlInfoDialog saveResourceUrlInfoDialog;
-    private ResourceUrlInfoDialog resourceUrlInfoDialog;
+    private Button btnSaveSourceUrl;
+    private Button btnLoadSourceUrlInfo;
+    private SaveSourceUrlInfoDialog saveResourceUrlInfoDialog;
+    private SourceUrlInfoDialog resourceUrlInfoDialog;
 
     private EditText etTargetUrl;
-    private Button btnSaveTargetUrl;
-    private Button btnLoadTargetUrl;
-    private SaveTargetUrlInfoDialog saveTargetUrlInfoDialog;
-    private TargetUrlInfoDialog targetUrlInfoDialog;
+    private Button btnSaveLiveRoomUrl;
+    private Button btnLoadLiveRoomUrl;
+    private SaveLiveRoomUrlInfoDialog saveTargetUrlInfoDialog;
+    private LiveRoomUrlInfoDialog targetUrlInfoDialog;
 
     private String resourceUrl;
     private String m3u8Url;
@@ -369,16 +369,16 @@ public class MainActivity extends AppCompatActivity {
         btnDisConnect.setOnClickListener(onClickListener);
 
         etResourceUrl = findViewById(R.id.etResourceUrl);
-        btnSaveResourceUrl = findViewById(R.id.btnSaveResourceUrl);
-        btnLoadResourceUrlInfo = findViewById(R.id.btnLoadResourceUrlInfo);
-        btnSaveResourceUrl.setOnClickListener(onClickListener);
-        btnLoadResourceUrlInfo.setOnClickListener(onClickListener);
+        btnSaveSourceUrl = findViewById(R.id.btnSaveSourceUrl);
+        btnLoadSourceUrlInfo = findViewById(R.id.btnLoadSourceUrlInfo);
+        btnSaveSourceUrl.setOnClickListener(onClickListener);
+        btnLoadSourceUrlInfo.setOnClickListener(onClickListener);
 
         etTargetUrl = findViewById(R.id.etTargetUrl);
-        btnSaveTargetUrl = findViewById(R.id.btnSaveTargetUrl);
-        btnLoadTargetUrl = findViewById(R.id.btnLoadTargetUrl);
-        btnSaveTargetUrl.setOnClickListener(onClickListener);
-        btnLoadTargetUrl.setOnClickListener(onClickListener);
+        btnSaveLiveRoomUrl = findViewById(R.id.btnSaveLiveRoomUrl);
+        btnLoadLiveRoomUrl = findViewById(R.id.btnLoadLiveRoomUrl);
+        btnSaveLiveRoomUrl.setOnClickListener(onClickListener);
+        btnLoadLiveRoomUrl.setOnClickListener(onClickListener);
 
         btnOpenLiveRoom = findViewById(R.id.btnOpenLiveRoom);
         btnCloseLiveRoom = findViewById(R.id.btnCloseLiveRoom);
@@ -535,13 +535,13 @@ public class MainActivity extends AppCompatActivity {
                         });
                     }
                     break;
-                case R.id.btnSaveResourceUrl:
+                case R.id.btnSaveSourceUrl:
                     resourceUrl = etResourceUrl.getText().toString();
                     if (TextUtils.isEmpty(resourceUrl)) {
                         Toast.makeText(getApplicationContext(), "直播源地址不能为空", Toast.LENGTH_SHORT).show();
                     } else {
                         if (null == saveResourceUrlInfoDialog) {
-                            saveResourceUrlInfoDialog = new SaveResourceUrlInfoDialog(MainActivity.this, R.style.dialog_custom, new SaveResourceUrlInfoDialog.CallBack() {
+                            saveResourceUrlInfoDialog = new SaveSourceUrlInfoDialog(MainActivity.this, R.style.dialog_custom, new SaveSourceUrlInfoDialog.CallBack() {
                                 @Override
                                 public void confirm(String name) {
                                     List<SourceUrlInfoBean> sourceUrlInfoBeans = localDataBean.getSourceUrlInfoBeans();
@@ -561,9 +561,9 @@ public class MainActivity extends AppCompatActivity {
                         saveResourceUrlInfoDialog.show();
                     }
                     break;
-                case R.id.btnLoadResourceUrlInfo:
+                case R.id.btnLoadSourceUrlInfo:
                     if (null == resourceUrlInfoDialog) {
-                        resourceUrlInfoDialog = new ResourceUrlInfoDialog(MainActivity.this, R.style.dialog_custom, new ResourceUrlInfoDialog.CallBack() {
+                        resourceUrlInfoDialog = new SourceUrlInfoDialog(MainActivity.this, R.style.dialog_custom, new SourceUrlInfoDialog.CallBack() {
                             @Override
                             public void confirm(String url) {
                                 etResourceUrl.setText(url);
@@ -572,13 +572,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                     resourceUrlInfoDialog.show();
                     break;
-                case R.id.btnSaveTargetUrl:
+                case R.id.btnSaveLiveRoomUrl:
                     liveRoomUrl = etTargetUrl.getText().toString();
                     if (TextUtils.isEmpty(liveRoomUrl)) {
                         Toast.makeText(getApplicationContext(), "直播间地址不能为空", Toast.LENGTH_SHORT).show();
                     } else {
                         if (null == saveTargetUrlInfoDialog) {
-                            saveTargetUrlInfoDialog = new SaveTargetUrlInfoDialog(MainActivity.this, R.style.dialog_custom, new SaveTargetUrlInfoDialog.CallBack() {
+                            saveTargetUrlInfoDialog = new SaveLiveRoomUrlInfoDialog(MainActivity.this, R.style.dialog_custom, new SaveLiveRoomUrlInfoDialog.CallBack() {
                                 @Override
                                 public void confirm(String name) {
                                     List<LiveRoomUrlInfoBean> liveRoomUrlInfoBeans = localDataBean.getLiveRoomUrlInfoBeans();
@@ -598,9 +598,9 @@ public class MainActivity extends AppCompatActivity {
                         saveTargetUrlInfoDialog.show();
                     }
                     break;
-                case R.id.btnLoadTargetUrl:
+                case R.id.btnLoadLiveRoomUrl:
                     if (null == targetUrlInfoDialog) {
-                        targetUrlInfoDialog = new TargetUrlInfoDialog(MainActivity.this, R.style.dialog_custom, new TargetUrlInfoDialog.CallBack() {
+                        targetUrlInfoDialog = new LiveRoomUrlInfoDialog(MainActivity.this, R.style.dialog_custom, new LiveRoomUrlInfoDialog.CallBack() {
                             @Override
                             public void confirm(String url) {
                                 etTargetUrl.setText(url);
@@ -1094,7 +1094,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     /**
      * 开始获取m3u8地址
      */
@@ -1110,4 +1109,7 @@ public class MainActivity extends AppCompatActivity {
         return localDataBean;
     }
 
+    public SharedPreferencesUtil getSharedPreferencesUtil() {
+        return sharedPreferencesUtil;
+    }
 }

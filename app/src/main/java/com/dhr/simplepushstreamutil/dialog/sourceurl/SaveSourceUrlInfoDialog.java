@@ -1,4 +1,4 @@
-package com.dhr.simplepushstreamutil.dialog.targeturl;
+package com.dhr.simplepushstreamutil.dialog.sourceurl;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.dhr.simplepushstreamutil.R;
 
-public class SaveTargetUrlInfoDialog extends Dialog {
+public class SaveSourceUrlInfoDialog extends Dialog {
     private CallBack callBack;
     private Context context;
 
@@ -22,7 +22,7 @@ public class SaveTargetUrlInfoDialog extends Dialog {
 
     private EditText etName;
 
-    public SaveTargetUrlInfoDialog(@NonNull Context context, @StyleRes int themeResId, CallBack callBack) {
+    public SaveSourceUrlInfoDialog(@NonNull Context context, @StyleRes int themeResId, CallBack callBack) {
         super(context, themeResId);
         this.context = context;
         this.callBack = callBack;
@@ -31,7 +31,7 @@ public class SaveTargetUrlInfoDialog extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dialog_targeturlinfo_save);
+        setContentView(R.layout.dialog_resourceurlinfo_save);
 
         initView();
     }

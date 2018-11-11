@@ -1,4 +1,4 @@
-package com.dhr.simplepushstreamutil.dialog.resourceurl;
+package com.dhr.simplepushstreamutil.dialog.liveroomurl;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.dhr.simplepushstreamutil.R;
 
-public class SaveResourceUrlInfoDialog extends Dialog {
+public class SaveLiveRoomUrlInfoDialog extends Dialog {
     private CallBack callBack;
     private Context context;
 
@@ -22,7 +22,7 @@ public class SaveResourceUrlInfoDialog extends Dialog {
 
     private EditText etName;
 
-    public SaveResourceUrlInfoDialog(@NonNull Context context, @StyleRes int themeResId, CallBack callBack) {
+    public SaveLiveRoomUrlInfoDialog(@NonNull Context context, @StyleRes int themeResId, CallBack callBack) {
         super(context, themeResId);
         this.context = context;
         this.callBack = callBack;
@@ -31,7 +31,7 @@ public class SaveResourceUrlInfoDialog extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dialog_resourceurlinfo_save);
+        setContentView(R.layout.dialog_targeturlinfo_save);
 
         initView();
     }

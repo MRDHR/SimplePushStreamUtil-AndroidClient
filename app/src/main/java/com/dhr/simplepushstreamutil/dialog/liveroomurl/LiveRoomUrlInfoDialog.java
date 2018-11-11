@@ -1,4 +1,4 @@
-package com.dhr.simplepushstreamutil.dialog.resourceurl;
+package com.dhr.simplepushstreamutil.dialog.liveroomurl;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -15,6 +15,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.dhr.simplepushstreamutil.R;
+import com.dhr.simplepushstreamutil.activity.MainActivity;
+import com.dhr.simplepushstreamutil.bean.LiveRoomUrlInfoBean;
+import com.dhr.simplepushstreamutil.bean.LocalDataBean;
 import com.dhr.simplepushstreamutil.bean.SourceUrlInfoBean;
 import com.dhr.simplepushstreamutil.util.SharedPreferencesUtil;
 import com.google.gson.Gson;
@@ -23,33 +26,32 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResourceUrlInfoDialog extends Dialog {
+public class LiveRoomUrlInfoDialog extends Dialog {
     private CallBack callBack;
-    private Context context;
+    private MainActivity mainActivity;
 
     private Button btnOk;
     private Button btnCancel;
     private Button btnRemove;
 
-    private EditText etName;
     private SharedPreferencesUtil sharedPreferencesUtil;
     private Gson gson = new Gson();
-    private List<SourceUrlInfoBean> resourceUrlInfoBeans;
+    private List<LiveRoomUrlInfoBean> liveRoomUrlInfoBeans;
 
     private ListView listContent;
     private ArrayAdapter<String> arrayAdapter;
     private List<String> list;
 
-    public ResourceUrlInfoDialog(@NonNull Context context, @StyleRes int themeResId, CallBack callBack) {
+    public LiveRoomUrlInfoDialog(@NonNull Context context, @StyleRes int themeResId, CallBack callBack) {
         super(context, themeResId);
-        this.context = context;
+        this.mainActivity = (MainActivity) context;
         this.callBack = callBack;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dialog_serverinfo_load);
+        setContentView(R.layout.dialog_targeturlinfo_load);
 
         initView();
         setOnShowListener(new OnShowListener() {
@@ -64,7 +66,6 @@ public class ResourceUrlInfoDialog extends Dialog {
         btnOk = findViewById(R.id.btnOk);
         btnCancel = findViewById(R.id.btnCancel);
         btnRemove = findViewById(R.id.btnRemove);
-        etName = findViewById(R.id.etName);
 
         btnOk.setOnClickListener(onClickListener);
         btnCancel.setOnClickListener(onClickListener);
@@ -74,31 +75,27 @@ public class ResourceUrlInfoDialog extends Dialog {
     }
 
     private void loadDataFromJson() {
-        if (null == sharedPreferencesUtil) {
-            sharedPreferencesUtil = new SharedPreferencesUtil(context);
-        }
-        String serverInfo = (String) sharedPreferencesUtil.getSharedPreference("ResourceUrlInfo", "");
-        if (!TextUtils.isEmpty(serverInfo)) {
-            resourceUrlInfoBeans = gson.fromJson(serverInfo, new TypeToken<ArrayList<SourceUrlInfoBean>>() {
-            }.getType());
+        sharedPreferencesUtil = mainActivity.getSharedPreferencesUtil();
+        liveRoomUrlInfoBeans = mainActivity.getLocalDataBean().getLiveRoomUrlInfoBeans();
+        if (null != liveRoomUrlInfoBeans) {
             if (null == list) {
                 list = new ArrayList<>();
             }
             list.clear();
-            for (SourceUrlInfoBean bean : resourceUrlInfoBeans) {
+            for (LiveRoomUrlInfoBean bean : liveRoomUrlInfoBeans) {
                 list.add(bean.getSaveName());
             }
             if (null == arrayAdapter) {
-                arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_single_choice, list);
+                arrayAdapter = new ArrayAdapter<>(mainActivity, android.R.layout.simple_list_item_single_choice, list);
                 listContent.setAdapter(arrayAdapter);
             } else {
                 arrayAdapter.notifyDataSetChanged();
             }
-            if (null != resourceUrlInfoBeans && !resourceUrlInfoBeans.isEmpty()) {
+            if (!liveRoomUrlInfoBeans.isEmpty()) {
                 listContent.setItemChecked(0, true);
             }
         } else {
-            resourceUrlInfoBeans = new ArrayList<>();
+            liveRoomUrlInfoBeans = new ArrayList<>();
         }
     }
 
@@ -112,23 +109,24 @@ public class ResourceUrlInfoDialog extends Dialog {
                 case R.id.btnOk:
                     int checkedItemPosition = listContent.getCheckedItemPosition();
                     if (checkedItemPosition >= 0) {
-                        SourceUrlInfoBean resourceUrlInfoBean = resourceUrlInfoBeans.get(checkedItemPosition);
-                        callBack.confirm(resourceUrlInfoBean.getUrl());
+                        LiveRoomUrlInfoBean liveRoomUrlInfoBean = liveRoomUrlInfoBeans.get(checkedItemPosition);
+                        callBack.confirm(liveRoomUrlInfoBean.getUrl());
                         dismiss();
                     } else {
-                        Toast.makeText(context.getApplicationContext(), "请选择需要提取的记录", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mainActivity.getApplicationContext(), "请选择需要提取的记录", Toast.LENGTH_SHORT).show();
                     }
                     break;
                 case R.id.btnRemove:
                     checkedItemPosition = listContent.getCheckedItemPosition();
                     if (checkedItemPosition >= 0) {
-                        if (!resourceUrlInfoBeans.isEmpty()) {
-                            resourceUrlInfoBeans.remove(checkedItemPosition);
-                            sharedPreferencesUtil.put("ResourceUrlInfo", gson.toJson(resourceUrlInfoBeans));
-                            loadDataFromJson();
+                        if (!liveRoomUrlInfoBeans.isEmpty()) {
+                            liveRoomUrlInfoBeans.remove(checkedItemPosition);
+                            mainActivity.getLocalDataBean().setLiveRoomUrlInfoBeans(liveRoomUrlInfoBeans);
+                            sharedPreferencesUtil.put(LocalDataBean.class.getSimpleName(), gson.toJson(mainActivity.getLocalDataBean()));
                         }
+                        loadDataFromJson();
                     } else {
-                        Toast.makeText(context.getApplicationContext(), "请选择需要删除的记录", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mainActivity.getApplicationContext(), "请选择需要删除的记录", Toast.LENGTH_SHORT).show();
                     }
                     break;
             }

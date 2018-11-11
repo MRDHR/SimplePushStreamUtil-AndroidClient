@@ -241,7 +241,7 @@
                         android:gravity="center">
 
                         <Button
-                            android:id="@+id/btnSaveResourceUrl"
+                            android:id="@+id/btnSaveSourceUrl"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="保存直播源地址" />
@@ -254,7 +254,7 @@
                         android:gravity="center">
 
                         <Button
-                            android:id="@+id/btnLoadResourceUrlInfo"
+                            android:id="@+id/btnLoadSourceUrlInfo"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="获取保存记录" />
@@ -353,7 +353,7 @@
                         android:gravity="center">
 
                         <Button
-                            android:id="@+id/btnSaveTargetUrl"
+                            android:id="@+id/btnSaveLiveRoomUrl"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="保存直播间地址" />
@@ -366,7 +366,7 @@
                         android:gravity="center">
 
                         <Button
-                            android:id="@+id/btnLoadTargetUrl"
+                            android:id="@+id/btnLoadLiveRoomUrl"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="获取保存记录" />

@@ -29,9 +29,10 @@ public class ConfigSchemeDialog extends Dialog {
     private Button btnOk;
     private Button btnCancel;
 
+    private ConfigSchemeBean configSchemeBean;
+
     public ConfigSchemeDialog(@NonNull Context context, @StyleRes int themeResId) {
         super(context, themeResId);
-        sharedPreferencesUtil = new SharedPreferencesUtil(context);
         mainActivity = (MainActivity) context;
     }
 
@@ -44,6 +45,7 @@ public class ConfigSchemeDialog extends Dialog {
     }
 
     private void initView() {
+        sharedPreferencesUtil = mainActivity.getSharedPreferencesUtil();
         rgConfig = findViewById(R.id.rgConfig);
         rb1 = findViewById(R.id.rb1);
         rb2 = findViewById(R.id.rb2);
@@ -51,7 +53,7 @@ public class ConfigSchemeDialog extends Dialog {
         btnCancel = findViewById(R.id.btnCancel);
         btnOk.setOnClickListener(onClickListener);
         btnCancel.setOnClickListener(onClickListener);
-        ConfigSchemeBean configSchemeBean = mainActivity.getLocalDataBean().getConfigSchemeBean();
+        configSchemeBean = mainActivity.getLocalDataBean().getConfigSchemeBean();
         switch (configSchemeBean.getSchemeType()) {
             case 0:
                 rb1.setChecked(true);
@@ -70,7 +72,6 @@ public class ConfigSchemeDialog extends Dialog {
                     dismiss();
                     break;
                 case R.id.btnOk:
-                    ConfigSchemeBean configSchemeBean = new ConfigSchemeBean();
                     switch (rgConfig.getCheckedRadioButtonId()) {
                         case R.id.rb1:
                             configSchemeBean.setSchemeType(0);
