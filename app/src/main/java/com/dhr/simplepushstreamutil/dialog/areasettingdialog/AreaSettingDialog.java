@@ -71,8 +71,10 @@ public class AreaSettingDialog extends Dialog {
         expListArea.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                for (LiveAreaListEntity.ListBean listBean : group.get(groupPosition).getList()) {
-                    listBean.setChecked(false);
+                for (LiveAreaListEntity dataBean : group) {
+                    for (LiveAreaListEntity.ListBean listBean : dataBean.getList()) {
+                        listBean.setChecked(false);
+                    }
                 }
                 group.get(groupPosition).getList().get(childPosition).setChecked(true);
                 myExpandableListAdapter.notifyDataSetChanged();
