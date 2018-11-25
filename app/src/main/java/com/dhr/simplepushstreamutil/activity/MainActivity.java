@@ -31,8 +31,9 @@ import com.dhr.simplepushstreamutil.bean.LocalDataBean;
 import com.dhr.simplepushstreamutil.bean.ResolutionBean;
 import com.dhr.simplepushstreamutil.bean.ServerInfoBean;
 import com.dhr.simplepushstreamutil.bean.SourceUrlInfoBean;
-import com.dhr.simplepushstreamutil.dialog.areasettingdialog.AreaSettingDialog;
+import com.dhr.simplepushstreamutil.dialog.areasetting.AreaSettingDialog;
 import com.dhr.simplepushstreamutil.dialog.bilibiliacount.BilibiliAccountDialog;
+import com.dhr.simplepushstreamutil.dialog.configquickly.ConfigQuicklyDialog;
 import com.dhr.simplepushstreamutil.dialog.configscheme.ConfigSchemeDialog;
 import com.dhr.simplepushstreamutil.dialog.log.LogDialog;
 import com.dhr.simplepushstreamutil.dialog.sourceurl.SourceUrlInfoDialog;
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
     private SaveServerInfoDialog saveServerInfoDialog;
     private ServerInfoDialog serverInfoDialog;
     private ConfigSchemeDialog configSchemeDialog;
+    private ConfigQuicklyDialog configQuicklyDialog;
 
     private EditText etResourceUrl;
     private Button btnSaveSourceUrl;
@@ -129,6 +131,10 @@ public class MainActivity extends AppCompatActivity {
     private LocalDataBean localDataBean;
     private String roomName;
     private String areaId;
+
+    private boolean isConfigQuickly = false;
+    private boolean isQuickly = false;
+    private Button btnQuickly;
 
     private WeakHandler weakHandler = new WeakHandler(new Handler.Callback() {
         @Override
@@ -311,7 +317,15 @@ public class MainActivity extends AppCompatActivity {
                 public void callBack(String roomName, String areaId) {
                     MainActivity.this.roomName = roomName;
                     MainActivity.this.areaId = areaId;
-                    updateTitleAndOpenLiveRoom();
+                    if (isConfigQuickly) {
+                        if (null != configQuicklyDialog) {
+                            configQuicklyDialog.updateData(areaId, roomName);
+                        }
+                        configQuicklyDialog.show();
+                    } else {
+                        updateTitleAndOpenLiveRoom();
+                    }
+                    isConfigQuickly = false;
                 }
             });
         }
@@ -349,6 +363,11 @@ public class MainActivity extends AppCompatActivity {
                         configSchemeDialog = new ConfigSchemeDialog(MainActivity.this, R.style.dialog_custom);
                     }
                     configSchemeDialog.show();
+                } else if (menuItemId == R.id.action_config_quickly) {
+                    if (null == configQuicklyDialog) {
+                        configQuicklyDialog = new ConfigQuicklyDialog(MainActivity.this, R.style.dialog_custom);
+                    }
+                    configQuicklyDialog.show();
                 }
                 return true;
             }
@@ -386,6 +405,8 @@ public class MainActivity extends AppCompatActivity {
         btnOpenLiveRoom.setOnClickListener(onClickListener);
         btnCloseLiveRoom.setOnClickListener(onClickListener);
         btnToMyLiveRoom.setOnClickListener(onClickListener);
+        btnQuickly = findViewById(R.id.btnQuickly);
+        btnQuickly.setOnClickListener(onClickListener);
 
         btnGetFormatList = findViewById(R.id.btnGetFormatList);
         btnStartPushStream = findViewById(R.id.btnStartPushStream);
@@ -612,6 +633,7 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.btnGetFormatList:
                     b = loadServerInfo();
                     if (!b) {
+                        isQuickly = false;
                         resourceUrl = etResourceUrl.getText().toString();
                         if (TextUtils.isEmpty(resourceUrl)) {
                             Toast.makeText(MainActivity.this, "请输入直播源地址后重试", Toast.LENGTH_SHORT).show();
@@ -670,6 +692,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         logDialog.clearAndAddLog("\n请先连接服务器后再进行操作");
                     } else {
+                        isConfigQuickly = false;
                         executorService.execute(new Runnable() {
                             @Override
                             public void run() {
@@ -707,6 +730,21 @@ public class MainActivity extends AppCompatActivity {
                         FromClientBean fromClientBean = new FromClientBean();
                         fromClientBean.setType(ParseMessageUtil.TYPE_TOMYLIVEROOM);
                         minaClient.send(fromClientBean);
+                    }
+                    break;
+                case R.id.btnQuickly:
+                    b = loadServerInfo();
+                    if (!b) {
+                        isQuickly = true;
+                        resourceUrl = etResourceUrl.getText().toString();
+                        if (TextUtils.isEmpty(resourceUrl)) {
+                            Toast.makeText(MainActivity.this, "请输入直播源地址后重试", Toast.LENGTH_SHORT).show();
+                        } else {
+                            listFormat.clear();
+                            formatListAdapter.notifyDataSetChanged();
+                            isLocalFile = false;
+                            getFormatListInLinux();
+                        }
                     }
                     break;
             }
@@ -799,14 +837,81 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         String cmd;
                         if (0 == localDataBean.getConfigSchemeBean().getSchemeType()) {
-                            String resolutionNo = listResolutions.get(spFormatList.getSelectedItemPosition()).getResolutionNo();
-                            //通过youtube-dl获取m3u8地址
-                            cmd = "youtube-dl -f " + resolutionNo + " -g " + resourceUrl;
-                        } else {
-                            String resolutionPx = listResolutions.get(spFormatList.getSelectedItemPosition()).getResolutionPx();
-                            if (resolutionPx.contains("(")) {
-                                resolutionPx = resolutionPx.substring(0, resolutionPx.lastIndexOf("("));
+                            if (isQuickly) {
+                                String resolution = localDataBean.getConfigQuicklyPushBean().getResolution();
+                                String cacheResolutionShort = "";
+                                switch (resolution) {
+                                    case "640x360":
+                                        cacheResolutionShort = "360";
+                                        break;
+                                    case "854x480":
+                                        cacheResolutionShort = "480";
+                                        break;
+                                    case "1280x720":
+                                        cacheResolutionShort = "720";
+                                        break;
+                                    case "1920x1080":
+                                        cacheResolutionShort = "1080";
+                                        break;
+                                }
+                                String resolutionNo = "";
+                                for (ResolutionBean resolutionBean : listResolutions) {
+                                    String resolutionPx = resolutionBean.getResolutionPx();
+                                    if (resolutionPx.contains(cacheResolutionShort)) {
+                                        resolutionNo = resolutionBean.getResolutionNo();
+                                    }
+                                }
+                                if (resolutionNo.isEmpty()) {
+                                    resolutionNo = listResolutions.get(listResolutions.size() - 1).getResolutionNo();
+                                }
+                                //通过youtube-dl获取m3u8地址
+                                cmd = "youtube-dl -f " + resolutionNo + " -g " + resourceUrl;
+                            } else {
+                                String resolutionNo = listResolutions.get(spFormatList.getSelectedItemPosition()).getResolutionNo();
+                                //通过youtube-dl获取m3u8地址
+                                cmd = "youtube-dl -f " + resolutionNo + " -g " + resourceUrl;
                             }
+                        } else {
+                            String resolutionPx = "";
+                            if (isQuickly) {
+                                String resolution = localDataBean.getConfigQuicklyPushBean().getResolution();
+                                String cacheResolutionShort = "";
+                                switch (resolution) {
+                                    case "640x360":
+                                        cacheResolutionShort = "360";
+                                        break;
+                                    case "854x480":
+                                        cacheResolutionShort = "480";
+                                        break;
+                                    case "1280x720":
+                                        cacheResolutionShort = "720";
+                                        break;
+                                    case "1920x1080":
+                                        cacheResolutionShort = "1080";
+                                        break;
+                                }
+                                for (ResolutionBean resolutionBean : listResolutions) {
+                                    resolutionPx = resolutionBean.getResolutionPx();
+                                    if (resolutionPx.contains("(")) {
+                                        resolutionPx = resolutionPx.substring(0, resolutionPx.lastIndexOf("("));
+                                    }
+                                    if (resolutionPx.contains(cacheResolutionShort)) {
+                                        break;
+                                    }
+                                }
+                                if (resolutionPx.isEmpty()) {
+                                    resolutionPx = listResolutions.get(listResolutions.size() - 1).getResolutionPx();
+                                    if (resolutionPx.contains("(")) {
+                                        resolutionPx = resolutionPx.substring(0, resolutionPx.lastIndexOf("("));
+                                    }
+                                }
+                            } else {
+                                resolutionPx = listResolutions.get(spFormatList.getSelectedItemPosition()).getResolutionPx();
+                                if (resolutionPx.contains("(")) {
+                                    resolutionPx = resolutionPx.substring(0, resolutionPx.lastIndexOf("("));
+                                }
+                            }
+                            //通过youtube-dl获取m3u8地址
                             cmd = "streamlink --stream-url " + resourceUrl + " " + resolutionPx;
                         }
                         FromClientBean fromClientBean = new FromClientBean();
@@ -864,20 +969,33 @@ public class MainActivity extends AppCompatActivity {
     public void getFormatListSuccess(List<ResolutionBean> listResolutions) {
         MainActivity.this.listResolutions.clear();
         MainActivity.this.listResolutions.addAll(listResolutions);
-        listFormat.clear();
-        for (ResolutionBean resolution : listResolutions) {
-            String result = "";
-            if (null != resolution.getResolutionPx() && !resolution.getResolutionPx().isEmpty()) {
-                result += resolution.getResolutionPx();
-            } else {
-                result += "无分辨率参数";
+        if (isQuickly) {
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    FromClientBean fromClientBean = new FromClientBean();
+                    fromClientBean.setType(ParseMessageUtil.TYPE_UPDATETITLEANDOPENLIVEROOM);
+                    fromClientBean.setAreaId(localDataBean.getConfigQuicklyPushBean().getAreaId());
+                    fromClientBean.setRoomName(localDataBean.getConfigQuicklyPushBean().getRoomName());
+                    minaClient.send(fromClientBean);
+                }
+            });
+        } else {
+            listFormat.clear();
+            for (ResolutionBean resolution : listResolutions) {
+                String result = "";
+                if (null != resolution.getResolutionPx() && !resolution.getResolutionPx().isEmpty()) {
+                    result += resolution.getResolutionPx();
+                } else {
+                    result += "无分辨率参数";
+                }
+                if (null != resolution.getFps() && !resolution.getFps().isEmpty()) {
+                    result += " " + resolution.getFps();
+                }
+                listFormat.add(result);
             }
-            if (null != resolution.getFps() && !resolution.getFps().isEmpty()) {
-                result += " " + resolution.getFps();
-            }
-            listFormat.add(result);
+            weakHandler.sendEmptyMessage(MainParam.getFormatListSuccess);
         }
-        weakHandler.sendEmptyMessage(MainParam.getFormatListSuccess);
     }
 
     public void getFormatListFail(String errLog) {
@@ -920,6 +1038,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openLiveRoomFail(String result) {
+        isConfigQuickly = false;
         Message msg = new Message();
         msg.what = MainParam.openLiveRoomFail;
         msg.obj = result;
@@ -962,6 +1081,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateTitleAndOpenLiveRoomSuccess(String result) {
+        if (isQuickly) {
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    FromClientBean fromClientBean = new FromClientBean();
+                    fromClientBean.setType(ParseMessageUtil.TYPE_LIVEROOMISOPEN);
+                    minaClient.send(fromClientBean);
+                }
+            });
+        }
         Message msg = new Message();
         msg.what = MainParam.updateTitleAndOpenLiveRoomSuccess;
         msg.obj = result;
@@ -1075,9 +1204,44 @@ public class MainActivity extends AppCompatActivity {
                         if (0 == localDataBean.getConfigSchemeBean().getSchemeType()) {
                             cache = "ffmpeg -thread_queue_size 1024 -i " + m3u8Url + videoParams + "\"" + liveRoomUrl + "\"";
                         } else {
-                            String resolutionPx = listResolutions.get(spFormatList.getSelectedItemPosition()).getResolutionPx();
-                            if (resolutionPx.contains("(")) {
-                                resolutionPx = resolutionPx.substring(0, resolutionPx.lastIndexOf("("));
+                            String resolutionPx = "";
+                            if (isQuickly) {
+                                String resolution = localDataBean.getConfigQuicklyPushBean().getResolution();
+                                String cacheResolutionShort = "";
+                                switch (resolution) {
+                                    case "640x360":
+                                        cacheResolutionShort = "360";
+                                        break;
+                                    case "854x480":
+                                        cacheResolutionShort = "480";
+                                        break;
+                                    case "1280x720":
+                                        cacheResolutionShort = "720";
+                                        break;
+                                    case "1920x1080":
+                                        cacheResolutionShort = "1080";
+                                        break;
+                                }
+                                for (ResolutionBean resolutionBean : listResolutions) {
+                                    resolutionPx = resolutionBean.getResolutionPx();
+                                    if (resolutionPx.contains("(")) {
+                                        resolutionPx = resolutionPx.substring(0, resolutionPx.lastIndexOf("("));
+                                    }
+                                    if (resolutionPx.contains(cacheResolutionShort)) {
+                                        break;
+                                    }
+                                }
+                                if (resolutionPx.isEmpty()) {
+                                    resolutionPx = listResolutions.get(listResolutions.size() - 1).getResolutionPx();
+                                    if (resolutionPx.contains("(")) {
+                                        resolutionPx = resolutionPx.substring(0, resolutionPx.lastIndexOf("("));
+                                    }
+                                }
+                            } else {
+                                resolutionPx = resolutionPx = listResolutions.get(spFormatList.getSelectedItemPosition()).getResolutionPx();
+                                if (resolutionPx.contains("(")) {
+                                    resolutionPx = resolutionPx.substring(0, resolutionPx.lastIndexOf("("));
+                                }
                             }
                             cache = "streamlink -O " + resourceUrl + " " + resolutionPx + " | ffmpeg -thread_queue_size 1024 -i pipe:0 " + videoParams + "\"" + liveRoomUrl + "\"";
                         }
@@ -1111,5 +1275,21 @@ public class MainActivity extends AppCompatActivity {
 
     public SharedPreferencesUtil getSharedPreferencesUtil() {
         return sharedPreferencesUtil;
+    }
+
+    public void getAreaList() {
+        if (null == minaClient) {
+            Toast.makeText(MainActivity.this, "请先连接服务器后再进行操作", Toast.LENGTH_SHORT).show();
+        } else {
+            isConfigQuickly = true;
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    FromClientBean fromClientBean = new FromClientBean();
+                    fromClientBean.setType(ParseMessageUtil.TYPE_OPENLIVEROOM);
+                    minaClient.send(fromClientBean);
+                }
+            });
+        }
     }
 }

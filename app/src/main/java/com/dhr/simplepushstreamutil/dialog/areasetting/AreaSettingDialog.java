@@ -1,4 +1,4 @@
-package com.dhr.simplepushstreamutil.dialog.areasettingdialog;
+package com.dhr.simplepushstreamutil.dialog.areasetting;
 
 import android.app.Dialog;
 import android.content.Context;

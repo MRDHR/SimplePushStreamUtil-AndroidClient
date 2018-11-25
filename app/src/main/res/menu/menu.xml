@@ -18,6 +18,11 @@
                     android:icon="@null"
                     android:title="配置解析方案"
                     app:showAsAction="ifRoom" />
+                <item
+                    android:id="@+id/action_config_quickly"
+                    android:icon="@null"
+                    android:title="配置一键推流信息"
+                    app:showAsAction="ifRoom" />
             </group>
         </menu>
     </item>
