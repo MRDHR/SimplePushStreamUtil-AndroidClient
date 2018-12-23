@@ -49,8 +49,11 @@ import com.dhr.simplepushstreamutil.util.ParseMessageUtil;
 import com.dhr.simplepushstreamutil.util.SharedPreferencesUtil;
 import com.google.gson.Gson;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -122,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
     private RadioButton rbOnlyAudio;
     private RadioButton rbOnlyImage;
     private CheckBox cbTwoInOne;
+    private CheckBox cbRecord;
 
     private MinaClient minaClient;
 
@@ -450,6 +454,7 @@ public class MainActivity extends AppCompatActivity {
         rbOnlyAudio = findViewById(R.id.rbOnlyAudio);
         rbOnlyImage = findViewById(R.id.rbOnlyImage);
         cbTwoInOne = findViewById(R.id.cbTwoInOne);
+        cbRecord = findViewById(R.id.cbRecord);
         rbBoth.setChecked(true);
     }
 
@@ -1238,12 +1243,17 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 }
                             } else {
-                                resolutionPx = resolutionPx = listResolutions.get(spFormatList.getSelectedItemPosition()).getResolutionPx();
+                                resolutionPx = listResolutions.get(spFormatList.getSelectedItemPosition()).getResolutionPx();
                                 if (resolutionPx.contains("(")) {
                                     resolutionPx = resolutionPx.substring(0, resolutionPx.lastIndexOf("("));
                                 }
                             }
                             cache = "streamlink -O " + resourceUrl + " " + resolutionPx + " | ffmpeg -thread_queue_size 1024 -i pipe:0 " + videoParams + "\"" + liveRoomUrl + "\"";
+                        }
+                        if (cbRecord.isChecked()) {
+                            SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
+                            String date = df1.format(new Date());
+                            cache += " -c:v copy -c:a aac -vbsf h264_mp4toannexb \"" + "/root/spsu_" + date + ".mp4\"";
                         }
                         System.out.println(cache);
                         FromClientBean fromClientBean = new FromClientBean();

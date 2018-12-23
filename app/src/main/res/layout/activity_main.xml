@@ -409,11 +409,23 @@
 
             </RadioGroup>
 
-            <CheckBox
-                android:id="@+id/cbTwoInOne"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="声音双轨合成单轨" />
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cbTwoInOne"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="声音双轨合成单轨" />
+
+                <CheckBox
+                    android:id="@+id/cbRecord"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="录像" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

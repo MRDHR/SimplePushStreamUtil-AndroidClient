@@ -1,5 +1,6 @@
 package com.dhr.simplepushstreamutil.dialog.serverinfo;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -40,6 +41,7 @@ public class ServerInfoDialog extends Dialog {
     private ListView listContent;
     private ArrayAdapter<String> arrayAdapter;
     private List<String> list;
+    private int checkedItemPosition;
 
     public ServerInfoDialog(@NonNull Context context, @StyleRes int themeResId, CallBack callBack) {
         super(context, themeResId);
@@ -106,7 +108,7 @@ public class ServerInfoDialog extends Dialog {
                     dismiss();
                     break;
                 case R.id.btnOk:
-                    int checkedItemPosition = listContent.getCheckedItemPosition();
+                    checkedItemPosition = listContent.getCheckedItemPosition();
                     if (checkedItemPosition >= 0) {
                         ServerInfoBean serverInfoBean = serverInfoBeans.get(checkedItemPosition);
                         callBack.confirm(serverInfoBean.getIp(), serverInfoBean.getPort(), serverInfoBean.getUserName(), serverInfoBean.getUserPassword());
@@ -118,12 +120,31 @@ public class ServerInfoDialog extends Dialog {
                 case R.id.btnRemove:
                     checkedItemPosition = listContent.getCheckedItemPosition();
                     if (checkedItemPosition >= 0) {
-                        if (!serverInfoBeans.isEmpty()) {
-                            serverInfoBeans.remove(checkedItemPosition);
-                            mainActivity.getLocalDataBean().setServerInfoBeans(serverInfoBeans);
-                            sharedPreferencesUtil.put(LocalDataBean.class.getSimpleName(), gson.toJson(mainActivity.getLocalDataBean()));
-                        }
-                        loadDataFromJson();
+                        AlertDialog.Builder
+                                normalDialog =
+                                new AlertDialog.Builder(mainActivity);
+                        normalDialog.setTitle("温馨提示：");
+                        normalDialog.setCancelable(false);
+                        normalDialog.setMessage("是否删除该条数据？");
+                        normalDialog.setPositiveButton("是",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (!serverInfoBeans.isEmpty()) {
+                                            serverInfoBeans.remove(checkedItemPosition);
+                                            mainActivity.getLocalDataBean().setServerInfoBeans(serverInfoBeans);
+                                            sharedPreferencesUtil.put(LocalDataBean.class.getSimpleName(), gson.toJson(mainActivity.getLocalDataBean()));
+                                        }
+                                        loadDataFromJson();
+                                    }
+                                });
+                        normalDialog.setNegativeButton("否",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                });
+                        normalDialog.show();
                     } else {
                         Toast.makeText(mainActivity.getApplicationContext(), "请选择需要删除的记录", Toast.LENGTH_SHORT).show();
                     }
