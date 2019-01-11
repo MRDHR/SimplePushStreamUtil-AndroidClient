@@ -4,9 +4,6 @@ public class MainParam {
     public static final int startGetFormatList = 0x10001;
     public static final int getFormatListSuccess = 0x10002;
     public static final int getFormatListFail = 0x10023;
-    public static final int startGetM3u8Url = 0x10003;
-    public static final int getM3u8UrlSuccess = 0x10004;
-    public static final int getM3u8UrlFail = 0x10024;
     public static final int startAssemblePushStreamCommand = 0x10005;
     public static final int pushStreamLog = 0x10006;
     public static final int stopPushStreamSuccess = 0x10007;

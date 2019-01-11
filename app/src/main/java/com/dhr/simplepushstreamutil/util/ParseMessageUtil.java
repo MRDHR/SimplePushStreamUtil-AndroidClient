@@ -6,7 +6,6 @@ import com.dhr.simplepushstreamutil.bean.FromServerBean;
 public class ParseMessageUtil {
     public static final int TYPE_OPENPORT = 0;
     public static final int TYPE_GETFORMATLIST = 1;
-    public static final int TYPE_GETM3U8 = 2;
     public static final int TYPE_PUSHSTREAMTOLIVEROOM = 3;
     public static final int TYPE_LOGIN = 4;
     public static final int TYPE_SAVELOGININFO = 5;
@@ -37,9 +36,6 @@ public class ParseMessageUtil {
                     break;
                 case TYPE_GETFORMATLIST:
                     commandUtil.getFormatList(fromServerBean);
-                    break;
-                case TYPE_GETM3U8:
-                    commandUtil.getM3u8Url(fromServerBean);
                     break;
                 case TYPE_PUSHSTREAMTOLIVEROOM:
                     commandUtil.pushStreamToLiveRoom(fromServerBean);

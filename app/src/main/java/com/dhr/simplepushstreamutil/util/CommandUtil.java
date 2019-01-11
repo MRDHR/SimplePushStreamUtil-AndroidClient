@@ -29,15 +29,6 @@ public class CommandUtil {
         }
     }
 
-    public void getM3u8Url(FromServerBean fromServerBean) {
-        int code = fromServerBean.getCode();
-        if (0 == code) {
-            mainActivity.getM3u8UrlSuccess(fromServerBean.getResult());
-        } else {
-            mainActivity.getM3u8UrlFail(fromServerBean.getResult());
-        }
-    }
-
     public void pushStreamToLiveRoom(FromServerBean fromServerBean) {
         int code = fromServerBean.getCode();
         if (0 == code) {
